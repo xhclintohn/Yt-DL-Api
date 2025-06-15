@@ -9,6 +9,7 @@
   "routes": [
     {
       "src": "/api/play",
+      "methods": ["GET"],
       "dest": "/api/play"
     }
   ]
