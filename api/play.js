@@ -1,9 +1,7 @@
-// /api/play.js
-import axios from 'axios';
-import ytSearch from 'yt-search';
-import ytdl from 'ytdl-core';
+const ytSearch = require('yt-search');
+const ytdl = require('ytdl-core');
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   try {
     const { query } = req.query;
 
@@ -28,9 +26,12 @@ export default async function handler(req, res) {
     const video = searchResults.videos[0];
     const videoUrl = `https://youtube.com/watch?v=${video.videoId}`;
 
-    // Get download URL (using ytdl-core)
+    // Get video info
     const info = await ytdl.getInfo(videoUrl);
-    const format = ytdl.chooseFormat(info.formats, { quality: 'highestaudio' });
+    const audioFormat = ytdl.chooseFormat(info.formats, { 
+      quality: 'highestaudio',
+      filter: 'audioonly'
+    });
 
     res.json({
       creator: "YourName",
@@ -42,16 +43,16 @@ export default async function handler(req, res) {
         duration: video.timestamp,
         views: video.views,
         published: video.ago,
-        download_url: format.url
+        download_url: audioFormat.url
       }
     });
 
   } catch (error) {
-    console.error(error);
+    console.error('API Error:', error);
     res.status(500).json({
       creator: "YourName",
       status: false,
-      message: "An error occurred."
+      message: "An error occurred while processing your request."
     });
   }
-}
+};
